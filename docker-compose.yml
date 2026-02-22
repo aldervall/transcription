@@ -1,0 +1,39 @@
+name: lyric-video-builder
+
+services:
+
+  # ── FastAPI backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .               # lyrics/ root — needed so COPY server/ works
+      dockerfile: server/Dockerfile
+    environment:
+      UPLOADS_DIR: /data/uploads
+    volumes:
+      - uploads:/data/uploads          # rendered videos + uploaded assets
+      - whisper_cache:/root/.cache/huggingface  # faster-whisper models (downloaded on first use)
+    restart: unless-stopped
+    # Not exposed externally — nginx proxies /api/* to it
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ── Vite frontend (built) served by nginx ────────────────────────────────────
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-80}:80"              # override with PORT=8080 docker compose up
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  uploads:
+    driver: local
+  whisper_cache:
+    driver: local

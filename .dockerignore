@@ -1,0 +1,5 @@
+# Ignore everything by default, then whitelist what backend needs
+**
+
+!server/
+!server/**
