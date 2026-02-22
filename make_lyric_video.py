@@ -8,6 +8,7 @@ Chorus detected by timestamp ranges from the transcript.
 
 import json
 import subprocess
+from pathlib import Path
 
 # Chorus time ranges (seconds) identified from transcript
 CHORUS_RANGES = [
@@ -108,11 +109,11 @@ def render_video(image: str, audio: str, ass: str, output: str):
 
 
 if __name__ == "__main__":
-    base   = "/home/dellvall/lyrics"
-    build_ass(f"{base}/Lycklig.json", f"{base}/Lycklig.ass")
+    base   = Path(__file__).parent
+    build_ass(base / "Lycklig.json", base / "Lycklig.ass")
     render_video(
-        image  = f"{base}/Gadw90kc.jpg",
-        audio  = f"{base}/Lycklig.mp3",
-        ass    = f"{base}/Lycklig.ass",
-        output = f"{base}/Lycklig_lyrics.mp4",
+        image  = base / "Gadw90kc.jpg",
+        audio  = base / "Lycklig.mp3",
+        ass    = base / "Lycklig.ass",
+        output = base / "Lycklig_lyrics.mp4",
     )
